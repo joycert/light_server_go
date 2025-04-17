@@ -1,0 +1,99 @@
+basePath: /
+definitions:
+  api.HealthResponse:
+    description: Response object containing the health status of the server
+    properties:
+      status:
+        description: The health status of the server
+        type: string
+    type: object
+  api.Message:
+    description: Message object containing the text command to control the lights
+    properties:
+      message:
+        description: The text command to control the lights
+        type: string
+    type: object
+  api.Response:
+    description: Response object containing the status, message and current RGB values
+    properties:
+      message:
+        description: Detailed message about the operation
+        type: string
+      rgb:
+        allOf:
+        - $ref: '#/definitions/utils.RGB'
+        description: Current RGB values of the lights
+      status:
+        description: Status of the operation (success/error)
+        type: string
+    type: object
+  utils.RGB:
+    description: RGB color value with red, green, and blue components
+    properties:
+      b:
+        description: Blue component (0-255)
+        type: integer
+      g:
+        description: Green component (0-255)
+        type: integer
+      r:
+        description: Red component (0-255)
+        type: integer
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: This is a server for controlling lights
+  title: Lights Server API
+  version: "1.0"
+paths:
+  /health:
+    get:
+      consumes:
+      - application/json
+      description: Returns the health status of the server
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Health check endpoint
+      tags:
+      - health
+  /messages:
+    post:
+      consumes:
+      - application/json
+      description: Takes a text message and converts it to RGB values to control the
+        lights
+      parameters:
+      - description: Message containing the light control command
+        in: body
+        name: message
+        required: true
+        schema:
+          $ref: '#/definitions/api.Message'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successfully processed the message
+          schema:
+            $ref: '#/definitions/api.Response'
+        "405":
+          description: Method not allowed
+          schema:
+            $ref: '#/definitions/api.Response'
+        "500":
+          description: Internal server error
+          schema:
+            $ref: '#/definitions/api.Response'
+      summary: Process a message to control lights
+      tags:
+      - messages
+swagger: "2.0"

@@ -1,0 +1,147 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is a server for controlling lights",
+        "title": "Lights Server API",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8080",
+    "basePath": "/",
+    "paths": {
+        "/health": {
+            "get": {
+                "description": "Returns the health status of the server",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "health"
+                ],
+                "summary": "Health check endpoint",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/messages": {
+            "post": {
+                "description": "Takes a text message and converts it to RGB values to control the lights",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "messages"
+                ],
+                "summary": "Process a message to control lights",
+                "parameters": [
+                    {
+                        "description": "Message containing the light control command",
+                        "name": "message",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/api.Message"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successfully processed the message",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response"
+                        }
+                    },
+                    "405": {
+                        "description": "Method not allowed",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal server error",
+                        "schema": {
+                            "$ref": "#/definitions/api.Response"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "api.HealthResponse": {
+            "description": "Response object containing the health status of the server",
+            "type": "object",
+            "properties": {
+                "status": {
+                    "description": "The health status of the server",
+                    "type": "string"
+                }
+            }
+        },
+        "api.Message": {
+            "description": "Message object containing the text command to control the lights",
+            "type": "object",
+            "properties": {
+                "message": {
+                    "description": "The text command to control the lights",
+                    "type": "string"
+                }
+            }
+        },
+        "api.Response": {
+            "description": "Response object containing the status, message and current RGB values",
+            "type": "object",
+            "properties": {
+                "message": {
+                    "description": "Detailed message about the operation",
+                    "type": "string"
+                },
+                "rgb": {
+                    "description": "Current RGB values of the lights",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/utils.RGB"
+                        }
+                    ]
+                },
+                "status": {
+                    "description": "Status of the operation (success/error)",
+                    "type": "string"
+                }
+            }
+        },
+        "utils.RGB": {
+            "description": "RGB color value with red, green, and blue components",
+            "type": "object",
+            "properties": {
+                "b": {
+                    "description": "Blue component (0-255)",
+                    "type": "integer"
+                },
+                "g": {
+                    "description": "Green component (0-255)",
+                    "type": "integer"
+                },
+                "r": {
+                    "description": "Red component (0-255)",
+                    "type": "integer"
+                }
+            }
+        }
+    }
+}
